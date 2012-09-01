@@ -1,0 +1,76 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+require "bundler/setup"
+require "trollop"
+require "gdbflasher"
+
+options = Trollop::options do
+  version "gdbflasher #{GdbFlasher::VERSION} (c) 2012 Sergey Gridasov"
+  banner <<-EOB
+gdbflasher is a gdbserver-compatible tool for loading firmware into ARM MCUs.
+
+Usage: gdbserver [options] <IHEX firmware>
+where [options] are:
+EOB
+
+  opt :server, "GDB server address", :type => :string, :default => "127.0.0.1:2331"
+  opt :mcu, "MCU name. Try '--mcu=list' to get list of supported controllers.", :required => true, :type => :string
+  opt :start, "Start application after programming"
+end
+
+if options[:mcu] == "list"
+  GdbFlasher::MCU_CLASSES.each do |sym, klass|
+    puts sym.to_s
+  end
+
+  exit 0
+elsif GdbFlasher::MCU_CLASSES[options[:mcu].intern].nil?
+  warn "MCU #{options[:mcu]} isn't supported."
+
+  exit 0
+elsif ARGV.count == 0
+  warn "Firmware file must be specified"
+
+  exit 1
+elsif ARGV.count > 1
+  warn "Only one firmware file must be specified"
+
+  exit 1
+end
+
+begin
+  firmware = File.open ARGV[0], "r"
+rescue Exception => e
+  warn e
+
+  exit 1
+end
+
+ihex = GdbFlasher::IHex.load firmware
+firmware.close
+
+puts "Loaded #{ARGV[0]}:"
+ihex.segments.each do |segment|
+  printf "  -> %08X - %08X\n", segment.base, segment.base + segment.size - 1
+end
+
+connection = GdbFlasher::ServerConnection.new
+connection.connect options[:server]
+
+mcu = GdbFlasher::MCU_CLASSES[options[:mcu].intern].new connection
+
+success = mcu.program_ihex ihex
+
+mcu.finalize
+
+if options[:start] && success
+  puts "Starting target application"
+  connection.reset
+end
+
+connection.close
+
+if !success
+  exit 1
+end
