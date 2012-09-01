@@ -5,14 +5,11 @@ class MCU
     @connection = connection
     @symbol_table = {}
 
-    helper_hex = File.join File.dirname(__FILE__), "..", "..", "helpers", helper_name + ".hex"
-    helper_sym = File.join File.dirname(__FILE__), "..", "..", "helpers", helper_name + ".sym"
+    helper_hex = File.join HELPERS, helper_name + ".hex"
+    helper_sym = File.join HELPERS, helper_name + ".sym"
 
     File.open(helper_sym, "r") do |f|
-      loop do
-        line = f.gets
-        break if line.nil?
-
+      f.each_line do |line|
         line.rstrip!
 
         address, symbol = line.split(" ")
@@ -173,13 +170,7 @@ class MCU
   end
 
   def is_blank(string)
-    for byte in string.bytes
-      if byte != blank_byte
-        return false
-      end
-    end
-
-    true
+    string.bytes.all? { |byte| byte == blank_byte }
   end
 
   def initialize_environment

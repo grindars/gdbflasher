@@ -18,20 +18,18 @@ module GdbFlasher
     def connect(address)
       raise "Already connected" unless @socket.nil?
 
-      match = address.match /^([0-9\.]+|\[[0-9a-fA-F:]\]+):([0-9]+)$/
-
-      if match.nil?
-        raise "Invalid server address: #{address}"
-      end
+      delimiter = address.rindex ':'
+      raise ArgumentError, "Port must be specified" if delimiter.nil?
+      host = address[0...delimiter]
+      port = address[delimiter + 1..-1].to_i
 
       @buf = ""
       @features = {}
       @need_ack = true
 
       begin
-        @socket = Socket.new Socket::AF_INET, Socket::SOCK_STREAM
+        @socket = TCPSocket.new host, port
         @socket.setsockopt Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1
-        @socket.connect Socket.sockaddr_in match[2].to_i, match[1]
 
         # Query stub features
         command("qSupported").split(';').each do |feature|

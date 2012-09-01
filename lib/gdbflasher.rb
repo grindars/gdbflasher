@@ -11,4 +11,6 @@ module GdbFlasher
     stm32f4xx: Stm32f4xx,
     stm32l1xx: Stm32l1xx
   }
+
+  HELPERS = File.join File.dirname(__FILE__), "..", "helpers"
 end

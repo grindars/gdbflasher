@@ -118,22 +118,20 @@ module GdbFlasher
       high_address = 0
       lines = {}
 
-      loop do
-
-        line = stream.readline
+      stream.each_line do |line|
         line.rstrip!
 
         record = Record.parse line
 
         case record.type
-          when :eof
-            break
+        when :eof
+          break
 
-          when :extended_address
-            high_address, = record.data.unpack "n"
+        when :extended_address
+          high_address, = record.data.unpack "n"
 
-          when :data
-            lines[(high_address << 16) | record.address] = record.data
+        when :data
+          lines[(high_address << 16) | record.address] = record.data
         end
       end
 
@@ -143,7 +141,7 @@ module GdbFlasher
       lines.sort_by { |k1,v1,k2,b2| k1 <=> k2 }.each do |address, data|
         if segment.nil? || segment.base + segment.size != address
           segment = Segment.new
-          segment.base = address;
+          segment.base = address
           segment.data = data
 
           ihex.segments << segment
