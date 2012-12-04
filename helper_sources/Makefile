@@ -1,4 +1,4 @@
-MCUS = stm32f4xx stm32l1xx
+MCUS = stm32f4xx stm32l1xx stm32f10xx_hd
 
 HELPERS = $(addprefix ../helpers/,$(addsuffix .hex,${MCUS}) $(addsuffix .sym,${MCUS}))
 ELVES = $(addsuffix .elf,${MCUS})

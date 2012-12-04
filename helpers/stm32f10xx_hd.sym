@@ -1,0 +1,7 @@
+00000800 PAGE_SIZE
+20000000 trap
+20000002 initialize
+2000000e finalize
+20000016 erase
+2000003c program
+20000084 page_buffer
