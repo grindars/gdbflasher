@@ -6,11 +6,11 @@ require "trollop"
 require "gdbflasher"
 
 options = Trollop::options do
-  version "gdbflasher #{GdbFlasher::VERSION} (c) 2012 Sergey Gridasov"
+  version "gdbflasher #{GdbFlasher::VERSION} (c) 2012 - 2013 Sergey Gridasov"
   banner <<-EOB
 gdbflasher is a gdbserver-compatible tool for loading firmware into ARM MCUs.
 
-Usage: gdbserver [options] <IHEX firmware>
+Usage: gdbflasher [options] <IHEX firmware>
 where [options] are:
 EOB
 
