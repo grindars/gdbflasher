@@ -7,6 +7,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{gdbflasher is a gdbserver-compatible tool for loading firmware into ARM MCUs.}
   gem.summary       = %q{Retargetable flasher for ARM microcontrollers}
   gem.homepage      = "https://github.com/grindars/gdbflasher"
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
